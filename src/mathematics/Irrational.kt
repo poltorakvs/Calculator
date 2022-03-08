@@ -73,7 +73,7 @@ abstract class Irrational: Real() {
  *
  * Exponent can't be 0, exponent can't be negative if base is 0 and base can't be negative if exponent is even.
  */
-class ArithmRad(private val base: Rational, private val exp: Rational, private val character: Boolean = true): Irrational() {
+class ArithmRad(private val base: Rational, private val exp: Rational, private val character: Boolean = true): Irrational(), MRoot1 {
 
     init {
         if (exp.isZero()) {
@@ -90,9 +90,17 @@ class ArithmRad(private val base: Rational, private val exp: Rational, private v
      */
     override fun toString(): String {
         return if (exp == Integer(2)) {
-            "⎷$base"
+            if (sign) {
+                "⎷$base"
+            } else {
+                "-⎷$base"
+            }
         } else {
-            "($exp)⎷$base"
+            if (sign) {
+                "($exp)⎷$base"
+            } else {
+                "-($exp)⎷$base"
+            }
         }
     }
 
@@ -315,11 +323,59 @@ class ArithmRad(private val base: Rational, private val exp: Rational, private v
         }
     }
 
-    operator fun times(other: ArithmRad): Real {
+    /**
+     * Multiplies given radicals.
+     */
+    override operator fun times(other: ArithmRad): MRoot1 {
+        if (other.isZero()) {
+            return Integer(0)
+        } else if (other.isOne()) {
+            return this
+        } else if (other.isMinusOne()) {
+            return this.opposite()
+        }
+
         val thisRad = this.simplify()
         val otherRad = other.simplify()
         val newExp = thisRad.exp as Integer scm otherRad.exp as Integer
-        TODO()
+        val newBase = thisRad.base.pow((newExp / thisRad.exp) as Integer) * otherRad.base.pow((newExp / otherRad.exp) as Integer)
+        val newSign = thisRad.sign == otherRad.sign
+        val res = ArithmRad(newBase, newExp, newSign).simplify()
+        val extracted = res.extractBase()
+        return if (extracted is Rational) {
+            extracted
+        } else {
+            ArithmRad(newBase, newExp, newSign).simplify()
+        }
+    }
+
+    override operator fun times(other: Rational): MRoot1 {
+        if (other.isZero()) {
+            return Integer(0)
+        } else if (other.isOne()) {
+            return this
+        } else if (other.isMinusOne()) {
+            return this.opposite()
+        }
+
+        val thisRad = this.simplify()
+        val otherSign = other.isPositive()
+        val multiplier = other.simplify().abs()
+        val newRad = ArithmRad(thisRad.base * multiplier.pow(thisRad.exp as Integer), thisRad.exp, otherSign == thisRad.sign).simplify()
+        val extracted = newRad.extractBase()
+        return if (extracted is Rational) {
+            extracted
+        } else {
+            newRad
+        }
+    }
+
+    override operator fun times(other: MRoot1): MRoot1 {
+        return if (other is Rational) {
+            this * other
+        } else {
+            this * other as ArithmRad
+        }
     }
 }
 

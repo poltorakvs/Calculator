@@ -59,45 +59,6 @@ class ZeroRadicalError(override val message: String?): MyException(message) {
 }
 
 
-
-/*
-fun <T1, T2, T3> assertThrows(result: KType, functionType: KFunction2<T1, T2, T3>, arg1: T1, arg2: T2): Unit? {
-    try {
-        functionType(arg1, arg2)
-    } catch (e: MyException) {
-        if (e.type != result) {
-            throw AssertionError("Incorrect exception was found.")
-        } else {
-            return null
-        }
-    }
-
-    throw AssertionError("No exception was found.")
-}
-*/
-
-
-/*
-fun assertThrows(result: KType, function: KCallable<Any>, vararg args: Any?): Unit? {
-    try {
-        function.call(*args)
-    } catch (e: MyException) {
-        if (e.type != result) {
-            throw AssertionError("Incorrect exception was found.")
-        } else {
-            return null
-        }
-    }
-
-    throw AssertionError("No exception was found.")
-}
-
-
-fun Method.invokeThrowable(obj: Any, vararg args: Any): Any {
-
-}
-*/
-
 fun assertThrows(result: KType, function: () -> Any): Unit? {
     try {
         function()
@@ -111,8 +72,6 @@ fun assertThrows(result: KType, function: () -> Any): Unit? {
 
     throw AssertionError("No exception was found.")
 }
-
-
 
 
 fun main() {

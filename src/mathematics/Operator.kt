@@ -468,40 +468,26 @@ open class Multiply constructor(private vararg val args: Base): Operator() {
 
                 "ArithmRad" -> {
                     val toDelete: MutableList<ArithmRad> = mutableListOf()
-                    var rationalAccumulator: Rational = Integer(1)
-                    var radicalAccumulator: ArithmRad = ArithmRad(Integer(1), Integer(1))
+                    var accumulator: MRoot1 = Integer(1)
                     list.map {
                         if (it is ArithmRad) {
                             toDelete.add(it)
 
                             val simple = it.simplify()
-                            val extracted = simple.extractBase()
-                            if (extracted is Rational) {
-                                rationalAccumulator *= extracted
-                            } else if (extracted is Multiply) {
-                                rationalAccumulator *= extracted.operands[0] as Rational
-                                val composition = extracted.operands[1] as ArithmRad * radicalAccumulator
-                                if (composition is ArithmRad) {
-                                    radicalAccumulator = composition
-                                } else {
-                                    rationalAccumulator *= composition as Rational
-                                    radicalAccumulator = ArithmRad(Integer(1), Integer(1))
-                                }
-                            } else {
-                                val composition = extracted as ArithmRad * radicalAccumulator
-                                if (composition is ArithmRad) {
-                                    radicalAccumulator = composition
-                                } else {
-                                    rationalAccumulator *= composition as Rational
-                                    radicalAccumulator = ArithmRad(Integer(1), Integer(1))
-                                }
-                            }
-                            TODO()
+                            accumulator *= simple
+                        }
+                    }
+                    if (accumulator is Rational) {
+                        list.add(accumulator)
+                    } else {
+                        val ex = (accumulator as ArithmRad).extractBase()
+                        if (ex is Multiply) {
+                            list.addAll(ex.args)
+                        } else {
+                            list.add((ex))
                         }
                     }
                     list.removeAll(toDelete)
-                    list.add(radicalAccumulator)
-                    list.add(rationalAccumulator)
                 }
 
                 "Fraction", "Integer" -> {

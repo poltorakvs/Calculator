@@ -8,7 +8,7 @@ import kotlin.math.*
  *
  * Derives [Base] class. Haven't any constructor.
 */
-abstract class Rational: Real() {
+abstract class Rational: Real(), MRoot1 {
 
     /**
      * Returns string representation of the class type.
@@ -61,7 +61,19 @@ abstract class Rational: Real() {
 
     abstract operator fun times(other: Integer): Rational
 
-    abstract operator fun times(other: Rational): Rational
+    abstract override operator fun times(other: Rational): Rational
+
+    override operator fun times(other: ArithmRad): MRoot1 {
+        return other * this
+    }
+
+    override operator fun times(other: MRoot1): MRoot1 {
+        return if (other is Rational) {
+            this * other
+        } else {
+            this * other as ArithmRad
+        }
+    }
 }
 
 /**
